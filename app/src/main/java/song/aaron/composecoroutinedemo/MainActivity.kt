@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import song.aaron.composecoroutinedemo.ui.theme.ComposeCoroutineDemoTheme
@@ -45,6 +46,29 @@ fun DemoView() {
         }) {
             Text(text = "Click Me")
         }
+
+        Button(onClick = {
+            coroutineScope.launch {
+                performSendTask()
+                performReceiveTask()
+            }
+        }) {
+            Text(text = "Channel")
+        }
+    }
+}
+
+val channel = Channel<Int> {  }
+
+suspend fun performSendTask() {
+    (1..6).forEach {
+        channel.send(it)
+    }
+}
+
+suspend fun performReceiveTask() {
+    repeat(6) {
+        println("Received: ${channel.receive()}")
     }
 }
 
@@ -56,7 +80,7 @@ suspend fun performSlowTask() {
     println("performSlowTask after")
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun DemoPreview() {
     DemoView()
